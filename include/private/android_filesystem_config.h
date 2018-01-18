@@ -107,6 +107,11 @@
 #endif
 
 #define AID_EVERYBODY     9997  /* shared between all apps in the same profile */
+
+#ifdef MTK_G_MT6589
+#define AID_CCCI 9996	
+#define AID_NVRAM 9997	
+#endif
  
 #define AID_MISC          9998  /* access to misc storage */
 #define AID_NOBODY        9999
@@ -196,6 +201,10 @@ static const struct android_id_info android_ids[] = {
     { "sensors",       AID_SENSORS, },
     { "rfs",           AID_RFS, },
     { "rfs_shared",    AID_RFS_SHARED, },
+#endif
+#ifdef MTK_G_MT6589
+    { "ccci", AID_CCCI, },
+    { "nvram", AID_NVRAM, },
 #endif
     { "everybody",     AID_EVERYBODY, },
     { "misc",          AID_MISC, },

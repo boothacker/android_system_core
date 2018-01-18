@@ -46,6 +46,10 @@ libbacktrace_shared_libraries_target := \
 	libcutils \
 	libgccdemangle \
 
+# To enable using libunwind on each arch, add it to this list.
+libunwind_architectures := arm arm64 mips x86 x86_64
+
+ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH),$(libunwind_architectures)))
 libbacktrace_src_files += \
 	UnwindCurrent.cpp \
 	UnwindMap.cpp \
@@ -64,9 +68,27 @@ libbacktrace_shared_libraries_host := \
 libbacktrace_static_libraries_host := \
 	libcutils \
 
+else
+libbacktrace_src_files += \
+	Corkscrew.cpp \
+
+libbacktrace_c_includes := \
+	system/core/libcorkscrew \
+
+libbacktrace_shared_libraries := \
+	libcorkscrew \
+
+libbacktrace_shared_libraries_target += \
+	libdl \
+
 libbacktrace_ldlibs_host := \
+	-ldl \
+
+libbacktrace_ldlibs_host += \
 	-lpthread \
 	-lrt \
+
+endif
 
 module := libbacktrace
 module_tag := optional

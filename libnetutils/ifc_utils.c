@@ -711,3 +711,8 @@ ifc_configure(const char *ifname,
 
     return 0;
 }
+
+int ifc_set_throttle(const char *ifname, int rxKbps, int txKbps) {
+    ALOGD("ifc_set_throttle: ifname=%s, rxKbps=%d, txKbps=%d", ifname, rxKbps, txKbps);
+    return 0;
+}

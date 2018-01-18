@@ -496,6 +496,26 @@ int __android_log_write(int prio, const char *tag, const char *msg)
     if (!tag)
         tag = "";
 
+    // Prevent MTK audio libs from spamming in the log
+    if (!strcmp(tag, "AudioMTKFilterManager") ||
+        !strcmp(tag, "AudioMTKFilter") ||
+        !strcmp(tag, "AudioMTKStreamOut") ||
+        !strcmp(tag, "AudioVPWStreamIn") ||
+        !strcmp(tag, "AudioDigitalControl") ||
+        !strcmp(tag, "AudioLoopbackController") ||
+        !strcmp(tag, "AudioMTKVolumeController") ||
+        !strcmp(tag, "AudioDigitalControl") ||
+        !strcmp(tag, "AudioAnalogControl") ||
+        !strcmp(tag, "AudioAfeReg") ||
+        !strcmp(tag, "AudioAnalogReg") ||
+        !strcmp(tag, "AudioPlatformDevice") ||
+        !strcmp(tag, "AudioMachineDevice") ||
+        !strcmp(tag, "MtkAudioLoud") ||
+        !strcmp(tag, "LoopbackManager") ||
+        !strcmp(tag, "AudioInterConnection")) {
+            return 0;
+    }
+
     /* XXX: This needs to go! */
     if (!strcmp(tag, "HTC_RIL") ||
         !strncmp(tag, "RIL", 3) || /* Any log tag with "RIL" as the prefix */
@@ -595,6 +615,27 @@ int __android_log_buf_print(int bufID, int prio, const char *tag, const char *fm
 
     return __android_log_buf_write(bufID, prio, tag, buf);
 }
+#if 0
+#ifdef MTK_MT6589
+struct xlog_record {
+        const char *tag_str;
+        const char *fmt_str;
+        int prio;
+};
+
+int __xlog_buf_printf(int bufid, const struct xlog_record *rec, ...)
+{
+    va_list ap;
+    char buf[LOG_BUF_SIZE];
+
+    va_start(ap, rec->fmt_str);
+    vsnprintf(buf, LOG_BUF_SIZE, rec->fmt_str, ap);
+    va_end(ap);
+
+    return __android_log_buf_write(bufid, rec->prio, rec->tag_str, buf);
+}
+#endif
+#endif
 
 void __android_log_assert(const char *cond, const char *tag,
                           const char *fmt, ...)

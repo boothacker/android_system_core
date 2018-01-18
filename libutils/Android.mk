@@ -91,6 +91,11 @@ LOCAL_CFLAGS += -DALIGN_DOUBLE
 endif
 LOCAL_CFLAGS += -Werror
 
+ifeq ($(TARGET_BOARD_PLATFORM),mt6589)
+LOCAL_CFLAGS += -DMTK_MT6589
+LOCAL_SRC_FILES += MediatekHacks.cpp
+endif
+
 LOCAL_C_INCLUDES += \
 		bionic/libc \
 		external/zlib
@@ -102,7 +107,10 @@ LOCAL_SHARED_LIBRARIES := \
         libbacktrace \
         liblog \
         libdl
-
+ifeq ($(TARGET_BOARD_PLATFORM),mt6589)
+LOCAL_SHARED_LIBRARIES += \
+		libcorkscrew
+endif
 include external/stlport/libstlport.mk
 
 LOCAL_MODULE:= libutils
@@ -119,6 +127,11 @@ LOCAL_SHARED_LIBRARIES := \
         libcutils \
         libdl \
         liblog
+ifeq ($(TARGET_BOARD_PLATFORM),mt6589)
+LOCAL_SHARED_LIBRARIES += \
+		libcorkscrew
+endif
+
 LOCAL_CFLAGS := -Werror
 LOCAL_C_INCLUDES += external/safe-iop/include
 

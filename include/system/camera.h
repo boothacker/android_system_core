@@ -90,7 +90,7 @@ enum {
     CAMERA_MSG_FOCUS_MOVE = 0x0800,       // notifyCallback
     CAMERA_MSG_STATS_DATA = 0x1000,
     CAMERA_MSG_META_DATA = 0x2000,
-    CAMERA_MSG_ALL_MSGS = 0xFFFF
+    CAMERA_MSG_ALL_MSGS = 0xC000FFFF
 };
 
 /** meta data type in CameraMetaDataCallback */

@@ -25,6 +25,10 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#ifdef MTK_MT6589
+#include <corkscrew/backtrace.h>
+#endif
+
 namespace android {
 
 class Printer;
@@ -50,6 +54,15 @@ public:
     void log(const char* logtag,
              android_LogPriority priority = ANDROID_LOG_DEBUG,
              const char* prefix = 0) const;
+/*#ifdef MTK_MT6589
+    void update(int32_t ignoreDepth=1, int32_t maxDepth=MAX_DEPTH);
+
+    // Dump a stack trace to the log
+    void dump(const char* prefix = 0) const;
+#endif*/
+
+    // Dump a stack trace to the log using the supplied logtag
+    void dump(const char* logtag, const char* prefix = 0) const;
 
     // Dump a stack trace to the specified file descriptor.
     void dump(int fd, int indent = 0, const char* prefix = 0) const;
@@ -67,6 +80,47 @@ private:
     Vector<String8> mFrameLines;
 };
 
+#ifdef MTK_MT6589
+class CallStac2
+ {
+ public:
+     enum {
+         MAX_DEPTH = 31
+     };
+ 
+     CallStac2();
+     CallStac2(const CallStac2& rhs);
+     ~CallStac2();
+ 
+     CallStac2& operator = (const CallStac2& rhs);
+     
+     bool operator == (const CallStac2& rhs) const;
+     bool operator != (const CallStac2& rhs) const;
+     bool operator < (const CallStac2& rhs) const;
+     bool operator >= (const CallStac2& rhs) const;
+     bool operator > (const CallStac2& rhs) const;
+     bool operator <= (const CallStac2& rhs) const;
+     
+     const void* operator [] (int index) const;
+     
+     void clear();
+  		  
+     void update(int32_t ignoreDepth=1, int32_t maxDepth=MAX_DEPTH);
+ 
+     // Dump a stack trace to the log
+     void dump(const char* prefix = 0) const;
+ 
+     // Return a string (possibly very long) containing the complete stack trace
+     String8 toString(const char* prefix = 0) const;
+     
+     size_t size() const { return mCount; }
+ 		  
+ private:
+     size_t mCount;
+     backtrace_frame_t mStack[MAX_DEPTH];
+ };
+#endif
+ 
 }; // namespace android
 
 #endif // ANDROID_CALLSTACK_H

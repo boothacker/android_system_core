@@ -721,6 +721,44 @@ static int console_init_action(int nargs, char **args)
     return 0;
 }
 
+#ifdef MTK_HARDWARE
+static int read_serialno()
+{
+    char pval[PROP_VALUE_MAX];
+    int fd;
+    char serialno[32];
+    size_t s;
+
+    int ret = property_get("ro.boot.serialno", pval);
+    if (ret > 0) {
+        NOTICE("Already get serial number from cmdline\n");
+        return 1;
+    }
+
+    fd = open("/sys/sys_info/serial_number", O_RDWR);
+    if (fd < 0) {
+        NOTICE("fail to open: %s\n", "/sys/sys_info/serial_number");
+        return 0;
+    }
+    s = read(fd, serialno, sizeof(char)*32);
+
+    serialno[s-1] = '\0';
+
+    close(fd);
+
+    if (s <= 0) {
+	    NOTICE("could not read serial number sys file\n");
+	    return 0;
+	}
+
+    NOTICE( "serial number=%s\n",serialno);
+
+    property_set("ro.boot.serialno", serialno);
+
+    return 1;
+}
+#endif
+
 static void import_kernel_nv(char *name, int for_emulator)
 {
     char *value = strchr(name, '=');
@@ -770,6 +808,9 @@ static void export_kernel_boot_props(void)
         { "ro.boot.mode", "ro.bootmode", "unknown", },
         { "ro.boot.baseband", "ro.baseband", "unknown", },
         { "ro.boot.bootloader", "ro.bootloader", "unknown", },
+#ifdef MTK_MT6589     
+        { "ro.boot.hardware",   "ro.hardware",   "mt6589", },
+#endif
     };
 
     for (i = 0; i < ARRAY_SIZE(prop_map); i++) {
@@ -819,6 +860,10 @@ static void process_kernel_cmdline(void)
     import_kernel_cmdline(0, import_kernel_nv);
     if (qemu[0])
         import_kernel_cmdline(1, import_kernel_nv);
+
+#ifdef MTK_HARDWARE
+    read_serialno();
+#endif
 
     /* now propogate the info given on command line to internal variables
      * used by init as well as the current required properties
@@ -926,6 +971,8 @@ static bool selinux_is_disabled(void)
 
 static bool selinux_is_enforcing(void)
 {
+    return false;  /*return false then set to permissive*/
+
 #ifdef ALLOW_DISABLE_SELINUX
     char tmp[PROP_VALUE_MAX];
 
@@ -1030,7 +1077,7 @@ static int charging_mode_booting(void)
         return 0;
 
     close(f);
-    return ('1' == cmb);
+    return ('8' == cmb);
 #endif
 }
 
