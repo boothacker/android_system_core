@@ -1,1 +1,4 @@
-
+cd system/core
+git remote add master https://github.com/boothacker/android_system_core
+git fetch master 
+git cherry-pick f12ce1b218c6d47e1c0af87d73245de6c3e5a1fe
